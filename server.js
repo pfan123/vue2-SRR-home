@@ -7,6 +7,10 @@ const compression = require('compression')  //压缩和解压
 const resolve = file => path.resolve(__dirname, file)
 const { createBundleRenderer } = require('vue-server-renderer')  //渲染器
 
+//data pre-fetch 纯数据获取的耗时
+//whole request 整个服务端渲染的耗时
+
+
 // 创建一个渲染器
 //const renderer = require('vue-server-renderer').createRenderer()
 

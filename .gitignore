@@ -4,5 +4,8 @@ npm-debug.log
 node_modules/
 .temp
 .sass-cache
+src/jdk/**
+src/legos_mod/**
+src/lib/**
 
 
