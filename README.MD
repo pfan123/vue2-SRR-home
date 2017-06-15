@@ -169,7 +169,15 @@ server.listen(5000, function (error) {
 
 通过阅读，入口 app.js 以及服务端 server.js 脚本，我们发现 `Vue Server-Side Render`原理是相当于有两份入口文件，如 entry-client.js 和 entry-server.js 分别提供给客户端和服务端进行执行，而服务端渲染通过 vue-server-renderer 库进行处理将结构返回至客户端达到直出结构（服务端直出结构挂载点会data-server-rendered="true"属性 ），然后客户端执行 entry-client.js 进行实例挂载，交互处理。
 
- 
+3.Vue 服务端渲染架构
+
+Vue官网的服务端渲染示意图
+
+![Vue 服务端渲染架构](http://7xrig5.com1.z0.glb.clouddn.com/vue2-server-renderer--git.png)
+
+从图上可以看出，ssr 有两个入口文件，client.js 和 server.js， 都包含了应用代码，webpack 通过两个入口文件分别打包成给服务端用的 server bundle 和给客户端用的 client bundle。当服务器接收到了来自客户端的请求之后，会创建一个渲染器 bundleRenderer，这个 bundleRenderer 会读取上面生成的 server bundle 文件，并且执行它的代码， 然后发送一个生成好的 html 到浏览器，等到客户端加载了 client bundle 之后，会和服务端生成的DOM 进行 Hydration(判断这个DOM 和自己即将生成的DOM 是否相同，如果相同就将客户端的vue实例挂载到这个DOM上， 否则会提示警告)。
+
+
 
 vue服务端渲染步骤
 
