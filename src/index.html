@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{title}}</title>
+    <meta charset="utf-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="shortcut icon" sizes="48x48" href="/public/logo-48.png">
+    <meta name="theme-color" content="#f60">
+    <link rel="manifest" href="/manifest.json">
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <!--#include virtual="/sinclude/common/head_dns_prefetch.shtml"-->
+    <!-- [278]测速点申请地址http://wqadmin.jd.com/athena/fd/index.php/point/ -->
+    <!-- 在img标签上加上属性onload="imageLoaded()"将会纳入首屏统计 -->
+    <script>
+      window._PFM_TIMING = [[404, new Date()]]
+      window.heatMap = true
+    </script>    
+    <!-- 这里是一个样式的页面片 -->
+    <!--#include virtual="/sinclude/cssi/fd/h5/wx/home_v2/home_fit.shtml"--> 
+  <style>
+    .fade-transition{-webkit-transition:opacity .5s ease;transition:opacity .5s ease}.fade-enter,.fade-leave{opacity:0}
+  </style>        
+  </head>
+  <body>
+  <!-- 公共头部 -->
+  <!--#include virtual="/sinclude/common/head_inc.shtml"-->
+  <!--#include virtual="/sinclude/common/head_shortcut.shtml"-->
+
+  <script> 
+    _PFM_TIMING[3] = new Date();
+  </script>
+
+    <!-- S 页面数据部分 -->
+    <!--#include virtual="/sinclude/update/wx/2017/4/homev2_fixnav.shtml"-->
+    <!-- E 页面数据部分 -->
+
+    <div class="wx_wrap" style="min-height: 100vh;">
+    <!--S 这个是服务端读取替换 -->
+    <!--vue-ssr-outlet-->  
+    <!--E 这个是服务端读取替换 -->
+    
+    <!-- 异步组件服务端初始会报错，由于bunld里面有挂载渲染 -->
+    <!-- <div id="app-async"></div> -->
+        
+    </div> 
+    
+    <!--#include virtual="/sinclude/update/wx/2017/4/homev2_shareInfo.shtml"-->
+    <script type="text/javascript">
+
+    if(window["homev2_shareInfo"][0]){
+      window.shareConfig = {
+          title   : window["homev2_shareInfo"][0].title,
+          desc    : window["homev2_shareInfo"][0].desc,
+          link    : "//" + location.hostname+location.pathname + "?ptag=37080.12.19",
+          img_url: window["homev2_shareInfo"][0].pics,
+          img_width: 100,
+          img_heigth: 100
+      };  
+    }
+
+
+    window._wxfootconfig = {
+        hot: {
+            xinrd: "39045.13.1",
+            brandrd: "39045.13.2",
+            juhuird: "39045.13.3",
+            accountrd: '137586.6.4'
+        },
+        search: {
+            index: 2,
+            con: 'searchfoot',
+            placeholder: '搜索更多喜欢的商品',
+            searchrd: '137586.6.1',
+            btnPtag: '137586.6.1',
+            inpPtag: '137586.6.1',
+            hotrd: '137586.6.2',
+            changerd:'137586.6.3',
+            manual: false,
+            wxruleid : 723 //热词拉取规则ID
+        }
+    };
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        _PFM_TIMING[2] = new Date()
+    })
+    window.addEventListener('load', function() {
+        _PFM_TIMING[4] = new Date()
+    })
+
+
+    </script>
+    <!--#include virtual="/sinclude/common/spdtimming_foot.shtml"-->        
+  </body>
+</html>
