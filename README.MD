@@ -179,12 +179,65 @@ Vue官网的服务端渲染示意图
 
 ## Vue 2.0 服务端渲染之数据预拉取存储 state
 
-Vue 2.0 服务端渲染其中最核心的过程就是 **服务端对数据预拉取，然后将数据使用 Vuex 进行管理更新存储 state**
+Vue 2.0 服务端渲染其中最核心的过程就是**服务端对数据预拉取，然后将数据使用 Vuex 进行管理更新存储 state**
+
+官方示例： 服务端拉取数据
+```
+//Server Data Fetching
+// entry-server.js
+import { createApp } from './app'
+
+export default context => {
+  return new Promise((resolve, reject) => {
+    const { app, router, store } = createApp()
+
+    router.push(context.url)
+
+    router.onReady(() => {
+      const matchedComponents = router.getMatchedComponents()
+      if (!matchedComponents.length) {
+        reject({ code: 404 })
+      }
+
+      // call asyncData() on all matched route components
+      Promise.all(matchedComponents.map(Component => {
+        if (Component.asyncData) {
+          return Component.asyncData({
+            store,
+            route: router.currentRoute
+          })
+        }
+      })).then(() => {
+        // After all preFetch hooks are resolved, our store is now
+        // filled with the state needed to render the app.
+        // When we attach the state to the context, and the `template` option
+        // is used for the renderer, the state will automatically be
+        // serialized and injected into the HTML as window.__INITIAL_STATE__.
+        context.state = store.state
+
+        resolve(app)
+      }).catch(reject)
+    }, reject)
+  })
+}
+```
+
+当使用 `template`, `context.state`， store初始数据将自动被嵌入到最终的HTML中通过 `window.__INITIAL_STATE__`变量形式。
+
+```
+// entry-client.js
+
+const { app, router, store } = createApp()
+
+if (window.__INITIAL_STATE__) {
+  store.replaceState(window.__INITIAL_STATE__)
+}
+```
 
 如果应用程序依赖于一些异步数据，这些数据之前需要预取和解决我们开始渲染过程
 
 
-vue服务端渲染步骤
+## vue服务端渲染步骤
 
 1.通过Express Web服务器实现简单的服务端渲染
 
@@ -192,25 +245,35 @@ vue服务端渲染步骤
 
 3.组件缓存
 
-* vue-server-renderer 文档:更多细节在这里，和更多先进的主题一起的文档。 例如 preventing cross-request contamination 和 添加独立的服务构建
-* vue-hackernews-2.0: 明确整合了 所有主要的Vue库和概念在单个应用中
 
+## vue-server-renderer 渲染 API
 
+`createRenderer([rendererOptions]) `
 
+Create a Renderer instance with (optional) options.
 
+```
+const { createRenderer } = require('vue-server-renderer')
+const renderer = createRenderer({ ... })
+```
 
-https://ssr.vuejs.org/en/
-渲染 API
-
-createRenderer([rendererOptions]) 
 * renderer.renderToString(vm, cb) 
 * renderer.renderToStream(vm) 
 
-createBundleRenderer(code, [rendererOptions]) 
+`createBundleRenderer(bundle[, options])`
+
+Create a BundleRenderer instance with a server bundle and (optional) options.
+
+```
+const { createBundleRenderer } = require('vue-server-renderer')
+const renderer = createBundleRenderer(serverBundle, { ... })
+```
+
 * bundleRenderer.renderToString([context], cb) 
 * bundleRenderer.renderToStream([context]) 
 Happypack、 DLLPlugin 优化webpack速度
 
+具体，[详见](https://ssr.vuejs.org/en/api.html)
 
 
 参考资料：
