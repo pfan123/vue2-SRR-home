@@ -1,4 +1,4 @@
-#VUE 2.0 服务端渲染
+# VUE 2.0 服务端渲染
 
 ## 什么是服务端渲染
 
@@ -14,8 +14,162 @@ Vue.js 框架是用来构建客户端应用的，默认情况下, Vue 组件生�
 - 2.直出保证用户最先看到基本的内容，减少首屏加载时间
 - 3.提高兼容性，vue ie9才支持，而直出兼容性更好
 
-> 服务端渲染 对比 预渲染(Prerendering)
-可以使用webpack插件 [“prerender-spa-plugin”](https://www.npmjs.com/package/prerender-spa-plugin) 添加预渲染。
+> ps: 如果仅仅是通过 SSR 改善页面的搜索引擎优化，那么你可能想要prerendering代替。而不是使用一个web服务器要编译动态HTML,prerendering只是为特定的路线在构建时生成静态HTML文件。优点是建立prerendering更简单,让你保持你的前端是一个完全静态的网站。如果你使用Webpack,您可以很容易地添加prerendering prerender-spa-plugin。
+
+
+
+## Vue 2.0 如何服务端渲染
+
+1.首先需要安装 `vue-server-renderer`，渲染页面结构
+
+```
+npm install vue vue-server-renderer --save
+```
+
+> 注意使用环境
+> node v6.0 以上、vue & vue-server-renderer >= 2.3.0、vue-router >= 2.5.0、vue-loader >= 12.0.0 & vue-style-loader >= 3.0.0
+
+2.官方简单上手例子，理解 Vue 直出原理
+
+index.html 前端模版文件
+```
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Vue App</title>
+  <script src="/assets/vue.js"></script>
+</head>
+<body>
+  <!-- 页面第一次打开，会看到 data-server-rendered="true" 直出标识，代表初始结构由服务端渲染，然后客户端挂载实例会进行替换，而实现的直出方式 -->
+  <div id="app"></div>
+  <script src="/assets/app.js"></script>
+  <script>app.$mount('#app')</script>
+</body>
+</html>
+```
+
+app.js 入口文件（兼容写法，cmd写法提供服务端渲染，this设置全局返回方法提供客户端脚本）
+
+```
+(function () { 'use strict'
+  var createApp = function () {
+
+    // Vue.extend()组件构造器
+    var MyComponent = Vue.extend({
+      template: '<div>大家好，{{msg}}我来了</div>',
+      data: function () {
+        return {
+          msg: 'Hello!'   //这里有一个很奇怪的地方，组件构造器生成的组件data数据需要return 返回，而实例new Vue()不需要（主要是处理指针问题）
+        }
+      },
+      created: function(){
+        console.log("组件开始创建")
+      }
+    })
+
+    // 要使用这个组件构造器做的组件，需要用 Vue.component(tag, consturctor)注册--全局注册
+    // Vue.component('my-component', MyComponent)
+
+
+    //客服端渲染其原理是，服务端先把挂载实例渲染出来，记住服务端客服端绑定的元素（简单点说就是id名都是一样的），然后客户端初始实例挂载再替换同样的内容（简单点说服务端先初始实例一遍，做直出渲染，然后客服端挂载再做同样的元素进行替换挂载，由于两者其实一样所以然并软）
+    
+    return new Vue({
+      //template是字符串模版拼接方案
+      template: '<div id="app">You have been <my-component></my-component>here for {{ counter }} seconds.</div>',
+
+	  //virtul Dom 方案
+      // render: (createElement) => {
+      //   return createElement('div',  Array.apply(null, { length: 20 }).map(function () {
+      //    console.log(createElement('p', 'hi1'))
+      //       return createElement('p', 'hi1')
+      //     }))        
+      // },
+      data: {
+        counter: 0
+      },
+
+      components: {
+        "my-component": MyComponent  //实例局部注册组件
+      },
+
+      created: function () {
+        var vm = this
+        setInterval(function () {
+          vm.counter += 1
+        }, 1000)
+      },
+      mounted: function () {
+        console.log("开始了，大家好吗")
+      }
+    })
+
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    console.log("服务端执行")
+    module.exports = createApp
+  } else {
+    console.log("客户端执行")
+    this.app = createApp()
+  }
+}).call(this)  
+```
+server.js 服务端脚本：
+
+```
+var fs = require('fs')
+var path = require('path')
+
+global.Vue = require('vue')
+
+// Get the HTML layout
+var layout = fs.readFileSync('./index.html', 'utf8')
+
+// Create a renderer
+var renderer = require('vue-server-renderer').createRenderer()
+
+var express = require('express')
+var server = express()
+
+// Serve files from the assets directory
+server.use('/assets', express.static(
+  path.resolve(__dirname, 'assets')
+))
+
+// Handle all GET requests
+server.get('*', function (request, response) {
+  // Render our Vue app to a string
+  renderer.renderToString(
+    // Create an app instance
+    require('./assets/app')(),
+    // Handle the rendered result
+    function (error, html) {
+      // If an error occurred while rendering...
+      if (error) {
+        // Log the error in the console
+        console.error(error)
+        // Tell the client something went wrong
+        return response
+          .status(500)
+          .send('Server Error')
+      }
+      // Send the layout with the rendered app's HTML
+      response.send(layout.replace('<div id="app"></div>', html))
+    }
+  )
+})
+
+// Listen on port 5000
+server.listen(5000, function (error) {
+  if (error) throw error
+  console.log('Server is running at localhost:5000')
+})
+
+```
+
+通过阅读，入口 app.js 以及服务端 server.js 脚本，我们发现 `Vue Server-Side Render`原理是相当于有两份入口文件，如 entry-client.js 和 entry-server.js 分别提供给客户端和服务端进行执行，而服务端渲染通过 vue-server-renderer 库进行处理将结构返回至客户端达到直出结构（服务端直出结构挂载点会data-server-rendered="true"属性 ），然后客户端执行 entry-client.js 进行实例挂载，交互处理。
+
+ 
 
 vue服务端渲染步骤
 
