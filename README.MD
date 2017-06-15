@@ -191,25 +191,8 @@ vue服务端渲染步骤
 * vue-hackernews-2.0: 明确整合了 所有主要的Vue库和概念在单个应用中
 
 
-Vue2.0服务端渲染: 博客前台升级记录  https://smallpath.me/post/vue-ssr-log
 
-Vue 2.0 服务端渲染怎么玩？https://blog.alphatr.com/how-to-use-ssr-in-vue-2.0.html
 
-全栈开发实战：用Vue2+Koa1开发完整的前后端项目（更新Koa2）https://molunerfinn.com/Vue+Koa/
-
-Vue2服务端渲染实践以及相关解读  https://juejin.im/post/5907fc6da0bb9f00650d59a1
-
-https://github.com/xiaomiwujiecao/react-server-example
-
- VUE + VUEX + FIREBASE + BULMA … 实现的 SPA SSR项目 
-https://github.com/beauty-enjoy/beauty
-
-vue服务端渲染文档
-vue2.0 ssr服务端指南  https://ssr.vuejs.org/en/
-官方demo https://github.com/vuejs/vue-hackernews-2.0
-
-谷歌推新版本Firebase：移动和Web开发的完整后端解决方案
-http://www.infoq.com/cn/news/2016/05/google-firebase
 
 https://ssr.vuejs.org/en/
 渲染 API
@@ -225,6 +208,21 @@ Happypack、 DLLPlugin 优化webpack速度
 
 
 参考资料：
+
 [Vue2.0 SSR 完全指南](https://ssr.vuejs.org/)
+
 [Vue2.0 SSR 官方示例](https://github.com/vuejs/vue-hackernews-2.0)
+
 [实测 Vue SSR 的渲染性能：避开 20 倍耗时](https://juejin.im/entry/59020c1744d90400690f6cfd)
+
+[谷歌推新版本Firebase：移动和Web开发的完整后端解决方案](http://www.infoq.com/cn/news/2016/05/google-firebase)
+
+[Vue2.0服务端渲染: 博客前台升级记录](https://smallpath.me/post/vue-ssr-log)  
+
+[Vue2服务端渲染实践以及相关解读](https://juejin.im/post/5907fc6da0bb9f00650d59a1)
+
+[简易的基于react_server服务端渲染的的实例](https://github.com/xiaomiwujiecao/react-server-example)
+
+[无痛学会各种 2 的 Vue2+Vuex2+Webpack2 前后端同构渲染](https://segmentfault.com/a/1190000007244289)
+
+[Vue 2 服务端渲染初探](https://segmentfault.com/a/1190000006701796)
